@@ -18,8 +18,12 @@ def cot_control_qa(
     monitor_aware: bool = False,
     eval_aware: bool = False,
     check_meta_discussion: bool = True,
+    judge_model: str | None = None,
 ) -> Task:
-    """Evaluate answer accuracy and compliance with a CoT constraint."""
+    """Evaluate answer accuracy and compliance with a CoT constraint.
+
+    judge_model selects the semantic judge; when omitted, bind the grader role.
+    """
     valid_modes = ("baseline", *CONTROL_PROMPTS)
     if mode not in valid_modes:
         raise ValueError(
@@ -31,7 +35,7 @@ def cot_control_qa(
             f"Expected one of: {', '.join(ADVERSARIAL_PRESSURES)}"
         )
 
-    dataset = load_cot_control_dataset(data=data)
+    dataset = load_cot_control_dataset(data=data, mode=mode)
 
     solver = cot_control_solver(
         mode=mode,
@@ -48,6 +52,7 @@ def cot_control_qa(
         non_reasoning=non_reasoning,
         output_no_letter_no_grading=output_no_letter_no_grading,
         check_meta_discussion=check_meta_discussion,
+        judge_model=judge_model,
     )
 
     return Task(
